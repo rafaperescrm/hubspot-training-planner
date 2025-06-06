@@ -24,7 +24,7 @@ export const Dashboard: React.FC = () => {
   const completedLessons = getLessonsByStatus('completed').length;
   const scheduledLessons = getLessonsByStatus('scheduled').length;
   const plannedLessons = getLessonsByStatus('planned').length;
-  const totalDuration = lessons.reduce((acc, lesson) => acc + lesson.duration, 0);
+  const totalDurationMinutes = lessons.reduce((acc, lesson) => acc + lesson.duration, 0);
   const lessonsWithVideo = lessons.filter(lesson => lesson.videoLink).length;
 
   // Filtros
@@ -130,7 +130,12 @@ export const Dashboard: React.FC = () => {
                   <Clock className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{Math.round(totalDuration / 60)}h</p>
+                  <p className="text-2xl font-bold">
+                    {totalDurationMinutes >= 60 
+                      ? `${Math.floor(totalDurationMinutes / 60)}h ${totalDurationMinutes % 60}min`
+                      : `${totalDurationMinutes}min`
+                    }
+                  </p>
                   <p className="text-sm text-muted-foreground">Duração Total</p>
                 </div>
               </div>
