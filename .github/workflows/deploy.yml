@@ -39,7 +39,7 @@ jobs:
           cache: 'npm'
       # 3. Instala as dependências do projeto
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       # 4. "Monta" o site (roda o comando de build que cria a pasta 'dist')
       - name: Build
         run: npm run build
