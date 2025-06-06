@@ -1,0 +1,58 @@
+# Workflow para publicar o conteúdo estático no GitHub Pages
+name: Deploy static content to Pages
+
+on:
+  # Roda sempre que houver uma alteração na branch 'main'
+  push:
+    branches: ["main"]
+
+  # Permite que você rode manualmente pela aba "Actions"
+  workflow_dispatch:
+
+# Define as permissões necessárias para o token do GitHub
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Garante que apenas um processo de publicação rode por vez
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # O trabalho de publicação
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Baixa o seu código do repositório
+      - name: Checkout
+        uses: actions/checkout@v4
+      # 2. Configura o ambiente (Node.js) para "montar" o site
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+      # 3. Instala as dependências do projeto
+      - name: Install dependencies
+        run: npm install
+      # 4. "Monta" o site (roda o comando de build que cria a pasta 'dist')
+      - name: Build
+        run: npm run build
+      # 5. Configura o GitHub Pages para receber o site
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      # 6. Faz o upload do site "montado" (a pasta 'dist')
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Faz o upload da pasta 'dist'
+          path: './dist'
+      # 7. Publica o site no GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
