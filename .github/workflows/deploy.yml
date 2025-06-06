@@ -37,7 +37,7 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      # 3. Instala as dependências do projeto
+      # 3. Instala as dependências do projeto (COM A CORREÇÃO)
       - name: Install dependencies
         run: npm ci
       # 4. "Monta" o site (roda o comando de build que cria a pasta 'dist')
