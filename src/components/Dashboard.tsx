@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { BookOpen, Calendar, Clock, Users, Video, Search, Filter } from 'lucide-react';
+import { BookOpen, Calendar, Clock, Users, Video, Search, Filter, LogOut, User } from 'lucide-react';
 import { useLessons } from '../contexts/LessonContext';
+import { useAuth } from '../contexts/AuthContext';
 import { LessonCard } from './LessonCard';
 import { AddLessonForm } from './AddLessonForm';
 import { LessonCalendar } from './LessonCalendar';
@@ -15,6 +16,7 @@ import { LessonCategory, LessonStatus } from '../types/lesson';
 
 export const Dashboard: React.FC = () => {
   const { lessons, getLessonsByStatus } = useLessons();
+  const { user, logout, isInstructor, isStudent } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState<LessonCategory | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<LessonStatus | 'all'>('all');
@@ -70,10 +72,23 @@ export const Dashboard: React.FC = () => {
                 HubSpot Training Center
               </h1>
               <p className="text-muted-foreground mt-1">
-                Gerencie seus treinamentos de CRM HubSpot
+                {isInstructor ? 'Gerencie seus treinamentos de CRM HubSpot' : 'Acesse seus treinamentos de CRM HubSpot'}
               </p>
             </div>
-            <AddLessonForm />
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                <span>{user?.name}</span>
+                <Badge variant={isInstructor ? 'default' : 'secondary'}>
+                  {isInstructor ? 'Instrutor' : 'Aluno'}
+                </Badge>
+              </div>
+              {isInstructor && <AddLessonForm />}
+              <Button variant="outline" size="sm" onClick={logout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sair
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -225,9 +240,12 @@ export const Dashboard: React.FC = () => {
                   <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-semibold mb-2">Nenhuma aula encontrada</h3>
                   <p className="text-muted-foreground mb-4">
-                    Tente ajustar os filtros ou criar uma nova aula.
+                    {isInstructor ? 
+                      'Tente ajustar os filtros ou criar uma nova aula.' : 
+                      'Tente ajustar os filtros para encontrar as aulas disponíveis.'
+                    }
                   </p>
-                  <AddLessonForm />
+                  {isInstructor && <AddLessonForm />}
                 </CardContent>
               </Card>
             )}

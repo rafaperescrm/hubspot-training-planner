@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar, Video, Clock, Users } from 'lucide-react';
 import { Lesson } from '../types/lesson';
+import { useAuth } from '../contexts/AuthContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -55,6 +55,7 @@ const categoryLabels = {
 };
 
 export const LessonCard: React.FC<LessonCardProps> = ({ lesson }) => {
+  const { isInstructor } = useAuth();
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   return (
@@ -114,19 +115,24 @@ export const LessonCard: React.FC<LessonCardProps> = ({ lesson }) => {
           )}
 
           <div className="flex gap-2 pt-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setIsEditOpen(true)}
-              className="flex-1"
-            >
-              Editar
-            </Button>
+            {isInstructor && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setIsEditOpen(true)}
+                className="flex-1"
+              >
+                Editar
+              </Button>
+            )}
             {lesson.videoLink && (
               <Button 
                 size="sm" 
                 onClick={() => window.open(lesson.videoLink, '_blank')}
-                className="flex-1 hubspot-gradient text-white hover:opacity-90"
+                className={cn(
+                  "hubspot-gradient text-white hover:opacity-90",
+                  isInstructor ? "flex-1" : "w-full"
+                )}
               >
                 <Video className="h-4 w-4 mr-2" />
                 Assistir
@@ -136,11 +142,13 @@ export const LessonCard: React.FC<LessonCardProps> = ({ lesson }) => {
         </CardContent>
       </Card>
 
-      <EditLessonDialog 
-        lesson={lesson}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-      />
+      {isInstructor && (
+        <EditLessonDialog 
+          lesson={lesson}
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+        />
+      )}
     </>
   );
 };
